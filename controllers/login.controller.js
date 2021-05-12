@@ -3,6 +3,59 @@ const bcrypt = require('bcrypt')
 const {Usuario} = require('../models');
 const { createJWT } = require("../helpers/JWT-helper");
 
+//Inicio de sesion
+const logIn = async(req = request, res = response) => {
+
+    try {
+
+        const {termino, password} = req.body
+
+        const usuario = await Usuario.findOne({
+            $or:[{email: termino}, {username: termino}],
+            $and: [{estado: true}]
+        })
+
+        if(!usuario){
+            return res.status(400).json({
+                ok: false,
+                errors:[
+                    {
+                        msg: 'Datos incorrectos (usuario o correo)'
+                    }
+                ]
+            })
+        }
+
+        const match = await bcrypt.compare(password, usuario.password)
+
+        if(!match){
+            return res.status(400).json({
+                ok: false,
+                errors:[
+                    {
+                        msg: 'Datos incorrectos (password)'
+                    }
+                ]
+            })
+        }
+
+        const token = await createJWT(usuario._id)
+
+        const data = {
+            ok: true,
+            usuario,
+            token
+        }
+
+        res.json(data)
+
+        
+    } catch (error) {
+        console.log(error)
+        res.status(400).json(error)
+    }
+
+}
 //Registrar usuario(desde login)
 const signUp = async(req = request, res = response) =>{
     try {
@@ -25,6 +78,7 @@ const signUp = async(req = request, res = response) =>{
         let token = await createJWT(newUser._id)
 
         res.json({
+            ok: true,
             usuario: newUser,
             token
         })
@@ -37,4 +91,5 @@ const signUp = async(req = request, res = response) =>{
 
 module.exports = {
     signUp,
+    logIn
 }
