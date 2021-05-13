@@ -15,7 +15,15 @@ const existeEmail = (email = '') => {
     })
 }
 
+const existeUsuarioId = (id = '') => {
+    return Usuario.findById(id).then(usuario =>{
+        if(!usuario)
+            return Promise.reject(`El usuario con id ${id} no existe`)
+    })
+}
+
 module.exports = {
     existeUsername,
-    existeEmail
+    existeEmail,
+    existeUsuarioId
 }

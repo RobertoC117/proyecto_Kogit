@@ -50,7 +50,8 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref:'role'
     },
-    posts:[{type:Schema.Types.ObjectId, ref:'post'}],
+    //Decidí ya no utilizarlo por que basta con poner el id del usuario en el schema post 
+    // posts:[{type:Schema.Types.ObjectId, ref:'post'}],
 })
 
 UserSchema.methods.toJSON = function() {

@@ -14,6 +14,20 @@ const createJWT = (uid = '') => {
     })
 }
 
+const verifyJWT = (token) => {
+    return new Promise((resolve, reject) => {
+        JWT.verify(token, process.env.GENERATION_SEED, (err, data) =>{
+            if(err){
+                console.log(err)
+                reject('El token no tiene una firma valida')
+            }
+
+            resolve(data)
+        })
+    })
+}
+
 module.exports = {
     createJWT,
+    verifyJWT
 }
