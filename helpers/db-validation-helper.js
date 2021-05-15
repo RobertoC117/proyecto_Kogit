@@ -1,4 +1,4 @@
-const { Usuario } = require('../models')
+const { Usuario, Post } = require('../models')
 
 
 const existeUsername = async(username = '') => {
@@ -16,14 +16,23 @@ const existeEmail = (email = '') => {
 }
 
 const existeUsuarioId = (id = '') => {
-    return Usuario.findById(id).then(usuario =>{
+    return Usuario.findOne({_id: id, estado: true}).then(usuario =>{
         if(!usuario)
             return Promise.reject(`El usuario con id ${id} no existe`)
+    })
+}
+
+
+const existePostId = (id = '') => {
+    return Post.findOne({_id:id, estado: true}).then(post => {
+        if(!post)
+            return Promise.reject(`El post con el id ${id} no existe`)
     })
 }
 
 module.exports = {
     existeUsername,
     existeEmail,
-    existeUsuarioId
+    existeUsuarioId,
+    existePostId
 }

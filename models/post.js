@@ -26,8 +26,13 @@ const PostSchema = new Schema({
         type: String,
         required: [true, 'El lenguaje es requerido']
     },
-    tags:{
-        type: Array,
+    tags:[
+        {type: String}
+    ],
+    estado:{
+        type: Boolean,
+        required: true,
+        default: true
     },
     comentarios:[
         {
@@ -46,7 +51,7 @@ const PostSchema = new Schema({
 })
 
 PostSchema.methods.toJSON = function() {
-    const {__v, _id, ...post} = this.toObject()
+    const {__v, _id, estado, ...post} = this.toObject()
     post.uid = _id;
     return post;
 }

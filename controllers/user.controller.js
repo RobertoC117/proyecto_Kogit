@@ -33,12 +33,10 @@ const obtenerMiPerfil = async(req = request, res = response) => {
 
         const id = req.usuarioAutenticado._id
         const user_data = await Usuario.findById(id)
-        const user_posts = await Post.find({autor: id })
 
         const data = {
             ok: true,
             usuario: user_data,
-            posts: user_posts
         }
 
         res.json(data)
@@ -57,12 +55,10 @@ const actualizarMiPerfil = async(req = request, res = response) =>{
         const id = req.usuarioAutenticado._id
     
         const user_data = await Usuario.findByIdAndUpdate(id, resto, {new: true})
-        const user_posts = await Post.find({autor: id})
     
         const data = {
             ok: true,
             usuario: user_data,
-            posts: user_posts
         }
     
         res.json(data)
@@ -96,12 +92,10 @@ const actualizarMiPassword = async(req = request, res = response) => {
         const encriptada = await bcrypt.hash(newpassword, salt)
 
         user_data = await Usuario.findByIdAndUpdate(id, {password: encriptada}, {new: true})
-        const user_posts = await Post.find({autor: id})
 
         const data = {
             ok: true,
             usuario: user_data,
-            posts: user_posts
         }
 
         res.json(data)
