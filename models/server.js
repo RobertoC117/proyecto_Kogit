@@ -25,6 +25,7 @@ class Server{
         this.app.use('/session',require('../routes/login-routes'))
         this.app.use(require('../routes/usuarios-routes'))
         this.app.use(require('../routes/posts-routes'))
+        this.app.use('/busqueda', require('../routes/search-routes'))
     }
 
     listen(){

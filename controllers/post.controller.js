@@ -81,6 +81,7 @@ const eliminarPost = async(req = request, res = response) =>{
         })
     } catch (error) {
         console.log(error)
+        res.status(400).json({ok:false, errors:[{msg: error}]})
     }
 }
 

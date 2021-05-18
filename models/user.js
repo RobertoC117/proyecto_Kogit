@@ -47,8 +47,11 @@ const UserSchema = new Schema({
     seguidores:[{type:Schema.Types.ObjectId, ref:'user'}],
     seguidos:[{type:Schema.Types.ObjectId, ref:'user'}],
     role:{
-        type: Schema.Types.ObjectId,
-        ref:'role'
+        // type: Schema.Types.ObjectId,
+        // ref:'role',
+        // default: "60a315056baf330ba4d6894c"
+        type: String,
+        default: "USER_ROLE"
     },
     //Decidí ya no utilizarlo por que basta con poner el id del usuario en el schema post 
     // posts:[{type:Schema.Types.ObjectId, ref:'post'}],
