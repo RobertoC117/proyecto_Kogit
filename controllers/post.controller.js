@@ -4,7 +4,7 @@ const { Post } = require("../models")
 const obtenerRepositorio = async(req = request, res = response) =>{
     try {
         const id = req.usuarioAutenticado._id
-        const posts = await Post.find({autor:id, estado:true})
+        const posts = await Post.find({autor:id, estado:true},'titulo texto lenguaje fecha likes tags')
         res.json({
             ok: true,
             posts,
@@ -19,6 +19,7 @@ const obtenerPost = async(req = request, res = response) => {
     try {
         const {id} = req.params
         const post = await Post.findById(id).populate('autor',['nombre','username','imgURL'])
+                                .populate('comentarios.usuario',['nombre', 'username', 'imgURL'])
         res.json({
             ok:true,
             post
@@ -85,10 +86,33 @@ const eliminarPost = async(req = request, res = response) =>{
     }
 }
 
+const comentarPost = async(req = request, res = response) =>{
+    try {
+        const { id } = req.params;
+        const { texto } = req.body;
+        const comentario = {
+            usuario: req.usuarioAutenticado._id,
+            texto
+        }
+        const post = await Post.findByIdAndUpdate(id, {$push:{comentarios:comentario}}, {new: true})
+                                .populate('comentarios.usuario',['nombre', 'username', 'imgURL'])
+
+        res.json({
+            ok: true,
+            post
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ok:false, errors:[{msg: error}]})
+    }
+}
+
 module.exports = {
     obtenerRepositorio,
     crearPost,
     obtenerPost,
     actualizarPost,
-    eliminarPost
+    eliminarPost,
+    comentarPost
 }

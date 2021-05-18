@@ -1,6 +1,11 @@
 const {Router} = require('express')
 const { param, body } = require('express-validator')
-const { obtenerRepositorio, crearPost, obtenerPost, actualizarPost, eliminarPost } = require('../controllers/post.controller')
+const { obtenerRepositorio, 
+        crearPost, 
+        obtenerPost, 
+        actualizarPost, 
+        eliminarPost,
+        comentarPost } = require('../controllers/post.controller')
 const { existePostId } = require('../helpers/db-validation-helper')
 const { checkErrors } = require('../middlewares/errors-validation')
 const { JWT_validator } = require('../middlewares/JWT-validation')
@@ -44,6 +49,13 @@ router.put('/posts/editar/:id', [
     body('tags').if(body('tags').exists()).isArray({min: 3, max:4}).withMessage('Los tags deben ser un array de 3 o 4 de lonjitud'),
     checkErrors   
 ], actualizarPost)
+
+//Comentar un post
+router.put('/posts/comentar/:id', [
+    JWT_validator,
+    body("texo", "El contenido del comentario es requerido").exists({checkFalsy: true}),
+    checkErrors
+], comentarPost)
 
 //Eliminar un post
 router.delete('/posts/eliminar/:id',[
