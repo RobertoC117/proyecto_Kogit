@@ -23,6 +23,8 @@ router.post('/signup', [
     body('email').custom(existeEmail),
     body('telefono').custom(isPhoneNumber),
     body('password').custom(isSecurePassword),
+    body('pregunta','La pregunta es requerida').exists({checkFalsy: true}),
+    body('pregunta','La respuesta debe ser un string de 3 a 20 caracteres').isString().isLength({min:3, max:20}),
     checkErrors
 ], signUp)
 

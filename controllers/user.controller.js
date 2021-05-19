@@ -8,7 +8,7 @@ const obtenerPerfil = async(req = request, res = response) => {
 
     try {
     
-        const user_data = await Usuario.findById(id)
+        const user_data = await Usuario.findById(id,{estado:0, pregunta:0, role:0})
         const user_posts = await Post.find({autor: id})
 
         const data = {
@@ -32,7 +32,7 @@ const obtenerMiPerfil = async(req = request, res = response) => {
     try {
 
         const id = req.usuarioAutenticado._id
-        const user_data = await Usuario.findById(id)
+        const user_data = await Usuario.findById(id, {estado:0, pregunta:0, role:0})
 
         const data = {
             ok: true,
@@ -54,7 +54,7 @@ const actualizarMiPerfil = async(req = request, res = response) =>{
 
         const id = req.usuarioAutenticado._id
     
-        const user_data = await Usuario.findByIdAndUpdate(id, resto, {new: true})
+        const user_data = await Usuario.findByIdAndUpdate(id, resto, {new: true, projection:{estado:0, pregunta:0, role:0}})
     
         const data = {
             ok: true,
@@ -91,7 +91,7 @@ const actualizarMiPassword = async(req = request, res = response) => {
         const salt = await bcrypt.genSalt()
         const encriptada = await bcrypt.hash(newpassword, salt)
 
-        user_data = await Usuario.findByIdAndUpdate(id, {password: encriptada}, {new: true})
+        user_data = await Usuario.findByIdAndUpdate(id, {password: encriptada}, {new: true, projection:{estado:0, pregunta:0, role:0}})
 
         const data = {
             ok: true,

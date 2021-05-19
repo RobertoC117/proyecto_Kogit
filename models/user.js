@@ -44,6 +44,14 @@ const UserSchema = new Schema({
         type: String,
         required: false
     },
+    pregunta:{
+        type: String,
+        required: [true, 'La pregunta es requerida'],
+    },
+    respuesta:{
+        type: String,
+        required: [true, 'La respuesta es requerida'],
+    },
     seguidores:[{type:Schema.Types.ObjectId, ref:'user'}],
     seguidos:[{type:Schema.Types.ObjectId, ref:'user'}],
     role:{
@@ -58,7 +66,7 @@ const UserSchema = new Schema({
 })
 
 UserSchema.methods.toJSON = function() {
-    const {__v, password, _id, ...usuario} = this.toObject()
+    const {__v, password, _id, respuesta, ...usuario} = this.toObject()
     usuario.uid = _id;
     return usuario;
 }

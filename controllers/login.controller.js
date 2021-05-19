@@ -13,7 +13,7 @@ const logIn = async(req = request, res = response) => {
         const usuario = await Usuario.findOne({
             $or:[{email: termino}, {username: termino}],
             $and: [{estado: true}]
-        })
+        },{estado:0, pregunta:0, role:0})
 
         if(!usuario){
             return res.status(400).json({
@@ -59,7 +59,7 @@ const logIn = async(req = request, res = response) => {
 //Registrar usuario(desde login)
 const signUp = async(req = request, res = response) =>{
     try {
-        const { nombre, username, password, email, telefono } = req.body;
+        const { nombre, username, password, email, telefono, pregunta, respuesta } = req.body;
 
         const salt = await bcrypt.genSalt(10)
 
@@ -68,7 +68,9 @@ const signUp = async(req = request, res = response) =>{
             username,
             password: await bcrypt.hash(password, salt),
             email,
-            telefono
+            telefono,
+            pregunta,
+            respuesta: await bcrypt.hash(respuesta, salt)
         }
 
         const newUser = new Usuario(data)
