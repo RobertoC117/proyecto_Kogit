@@ -1,8 +1,8 @@
 const JWT = require('jsonwebtoken')
 
-const createJWT = (uid = '') => {
+const createJWT = (uid = '', seed = process.env.GENERATION_SEED, tiempo_exp = process.env.EXP_TIME_TOKEN) => {
     return new Promise((resolve, reject) =>{
-        JWT.sign({uid}, process.env.GENERATION_SEED,{expiresIn: process.env.EXP_TIME_TOKEN},(err, token)=>{
+        JWT.sign({uid}, seed,{expiresIn: tiempo_exp},(err, token)=>{
 
             if(err){
                 console.log(err)
@@ -14,12 +14,12 @@ const createJWT = (uid = '') => {
     })
 }
 
-const verifyJWT = (token) => {
+const verifyJWT = (token, seed = process.env.GENERATION_SEED) => {
     return new Promise((resolve, reject) => {
-        JWT.verify(token, process.env.GENERATION_SEED, (err, data) =>{
+        JWT.verify(token, seed, (err, data) =>{
             if(err){
                 console.log(err)
-                reject('El token no tiene una firma valida')
+                reject('Token no valido')
             }
 
             resolve(data)

@@ -30,9 +30,17 @@ const existePostId = (id = '') => {
     })
 }
 
+const verificarEmailEstado = (email = '') => {
+    return Usuario.findOne({email, estado: true}).then(usuario => {
+        if(!usuario)
+            return Promise.reject(`El email ${email} no está asociado a ninguna cuenta`)
+    })
+}
+
 module.exports = {
     existeUsername,
     existeEmail,
     existeUsuarioId,
-    existePostId
+    existePostId,
+    verificarEmailEstado
 }
