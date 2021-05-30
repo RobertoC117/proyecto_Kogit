@@ -1,6 +1,6 @@
 const {Router} = require('express')
 const { param, body } = require('express-validator')
-const { obtenerPerfil, obtenerMiPerfil, actualizarMiPerfil, actualizarMiPassword } = require('../controllers/user.controller')
+const { obtenerPerfil, obtenerMiPerfil, actualizarMiPerfil, actualizarMiPassword, seguirUsuario } = require('../controllers/user.controller')
 const { existeUsuarioId } = require('../helpers/db-validation-helper')
 const { isPhoneNumber, isSecurePassword } = require('../helpers/validation-helper')
 const { checkErrors } = require('../middlewares/errors-validation')
@@ -56,6 +56,15 @@ router.put('/usuarios/update/password', [
     body('newpassword').custom(isSecurePassword),
     checkErrors
 ], actualizarMiPassword)
+
+router.put('/usuarios/seguir/:id', [
+    JWT_validator,
+    param('id','No es un mongo ID valido').isMongoId(),
+    checkErrors,
+    param('id').custom(existeUsuarioId),
+    checkErrors
+], seguirUsuario)
+
 //#endregion
 
 

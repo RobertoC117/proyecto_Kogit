@@ -5,15 +5,21 @@ const bcrypt = require('bcrypt')
 const obtenerPerfil = async(req = request, res = response) => {
     
     const { id } = req.params;
+    const miID = req.usuarioAutenticado._id
 
     try {
     
         const user_data = await Usuario.findById(id,{estado:0, pregunta:0, role:0})
         const user_posts = await Post.find({autor: id})
 
+        const seguido = user_data.seguidores.includes(miID)
+
         const data = {
             ok: true,
-            usuario: user_data,
+            usuario: {
+                seguido,
+                ...user_data.toJSON()
+            },
             posts: user_posts
         }
 
@@ -106,9 +112,50 @@ const actualizarMiPassword = async(req = request, res = response) => {
     }
 }
 
+const seguirUsuario = async(req = request, res = response) =>{
+    try {
+        const {id} = req.params
+        const miID = req.usuarioAutenticado._id
+
+        let perfil = await Usuario.findById(id)
+        const posts = await Post.find({autor: id})
+        let seguido = perfil.seguidores.includes(miID)
+
+        if(seguido){
+            perfil = await Usuario.findByIdAndUpdate(id,{ $pull:{ seguidores: miID } }, {new: true})
+            await Usuario.findByIdAndUpdate(miID,{ $pull:{ seguidos: id } })
+            return res.json({
+                ok: true,
+                usuario: {
+                    seguido: false,
+                    ...perfil.toJSON()
+                },
+                posts
+            })
+        }
+
+        perfil.seguidores.push(miID)
+        await perfil.save()
+        await Usuario.findByIdAndUpdate(miID,{ $push:{seguidos: id} })
+        return res.json({
+            ok: true,
+            usuario: {
+                seguido: true,
+                ...perfil.toJSON()
+            },
+            posts
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ok:false, errors:[{msg: error}]})
+    }
+}
+
 module.exports = {
     obtenerPerfil,
     obtenerMiPerfil,
     actualizarMiPerfil,
-    actualizarMiPassword
+    actualizarMiPassword,
+    seguirUsuario
 }

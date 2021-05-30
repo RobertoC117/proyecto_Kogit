@@ -5,7 +5,8 @@ const { obtenerRepositorio,
         obtenerPost, 
         actualizarPost, 
         eliminarPost,
-        comentarPost } = require('../controllers/post.controller')
+        comentarPost, 
+        like} = require('../controllers/post.controller')
 const { existePostId } = require('../helpers/db-validation-helper')
 const { checkErrors } = require('../middlewares/errors-validation')
 const { JWT_validator } = require('../middlewares/JWT-validation')
@@ -56,6 +57,15 @@ router.put('/posts/comentar/:id', [
     body("texo", "El contenido del comentario es requerido").exists({checkFalsy: true}),
     checkErrors
 ], comentarPost)
+
+//Me gusta
+router.put('/posts/megusta/:id_post', [
+    JWT_validator,
+    param('id_post', 'No es un mongo ID valido').isMongoId(),
+    checkErrors,
+    param('id_post').custom(existePostId),
+    checkErrors
+], like)
 
 //Eliminar un post
 router.delete('/posts/eliminar/:id',[

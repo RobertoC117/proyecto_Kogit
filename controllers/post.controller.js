@@ -17,13 +17,21 @@ const obtenerRepositorio = async(req = request, res = response) =>{
 
 const obtenerPost = async(req = request, res = response) => {
     try {
-        const {id} = req.params
+        const {id} = req.params //id del post
+        const {_id} = req.usuarioAutenticado //id del usuario que hace la peticion
         const post = await Post.findById(id).populate('autor',['nombre','username','imgURL'])
-                                .populate('comentarios.usuario',['nombre', 'username', 'imgURL'])
+                                .populate('comentarios.usuario',['nombre', 'username', 'imgURL']);
+
+        let me_gusta = post.users_likes.includes(_id)
+        
         res.json({
             ok:true,
-            post
+            post:{
+                me_gusta,
+                ...post.toJSON()
+            }
         })
+
     } catch (error) {
         console.log(error)
     }
@@ -97,14 +105,63 @@ const comentarPost = async(req = request, res = response) =>{
         const post = await Post.findByIdAndUpdate(id, {$push:{comentarios:comentario}}, {new: true})
                                 .populate('comentarios.usuario',['nombre', 'username', 'imgURL'])
 
+        let me_gusta = post.users_likes.includes(comentario.usuario)
+
         res.json({
             ok: true,
-            post
+            post:{
+                me_gusta,
+                ...post.toJSON()
+            }
         })
 
     } catch (error) {
         console.log(error)
         res.status(400).json({ok:false, errors:[{msg: error}]})
+    }
+}
+
+const like = async(req = request, res = response) => {
+    try {
+        const {id_post} = req.params
+        const {_id} = req.usuarioAutenticado
+        let post = await Post.findById(id_post)
+
+        console.log(_id)
+
+        let me_gusta = post.users_likes.includes(_id)
+        
+        if(me_gusta)
+        {
+            post = await Post.findByIdAndUpdate(id_post, {$pull:{users_likes:_id}}, {new: true})
+                            .populate('autor',['nombre','username','imgURL'])
+                            .populate('comentarios.usuario',['nombre', 'username', 'imgURL'])
+
+            return res.json({
+                ok: true, 
+                post:{
+                    me_gusta: false,
+                    ...post.toJSON()
+                }
+            })
+        }
+
+        post.users_likes.push(_id)
+        await post.save()
+
+        await post.populate('autor',['nombre','username','imgURL'])
+                    .populate('comentarios.usuario',['nombre', 'username', 'imgURL']).execPopulate()
+
+        return res.json({
+            ok: true, 
+            post:{
+                me_gusta: true,
+                ...post.toJSON()
+            }
+        })
+
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -114,5 +171,6 @@ module.exports = {
     obtenerPost,
     actualizarPost,
     eliminarPost,
-    comentarPost
+    comentarPost,
+    like
 }
