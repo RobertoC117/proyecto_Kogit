@@ -1,5 +1,6 @@
 const express = require('express')
 const {dbConnection} = require('../database/config')
+const cors = require('cors');
 
 class Server{
 
@@ -19,6 +20,7 @@ class Server{
     activeMiddlewares(){
         this.app.use(express.urlencoded({extended: false}))
         this.app.use(express.json()) 
+        this.app.use(cors())
     }
 
     activeRoutes(){
