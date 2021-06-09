@@ -1,6 +1,8 @@
 const { request, response } = require("express");
 const { Usuario, Post } = require("../models");
 const bcrypt = require('bcrypt')
+const cloudinary = require('cloudinary').v2
+cloudinary.config(process.env.CLOUDINARY_URL)
 
 const obtenerPerfil = async(req = request, res = response) => {
     
@@ -152,10 +154,53 @@ const seguirUsuario = async(req = request, res = response) =>{
     }
 }
 
+const updateImagen = async(req = request, res = response) => {
+    try {
+        const {tempFilePath, name} = req.files.archivo
+
+        const extensionesValidas = ['png','jpg','jpeg','gif']
+
+        let nombreArray = name.split('.')
+
+        let extension = nombreArray[nombreArray.length -1]
+
+        console.log(extension)
+
+        if(!extensionesValidas.includes(extension)){
+            return res.status(400).json({ok:false, errors:[{msg: "Tipo de archivo no valido"}]})
+        }
+
+        let usuario = await Usuario.findById(req.usuarioAutenticado._id)
+
+        const {secure_url} = await cloudinary.uploader.upload(tempFilePath,{folder:"usuarios/"})
+
+        if(usuario.imgURL){
+            const arreglo_url = usuario.imgURL.split('/')
+            let fullName = arreglo_url[arreglo_url.length - 2] + '/' + arreglo_url[arreglo_url.length - 1]
+            let [id_imagen] = fullName.split('.')
+            console.log(id_imagen)
+            cloudinary.uploader.destroy(id_imagen)
+        }
+
+        usuario.imgURL = secure_url
+
+        await usuario.save()
+
+        res.json({
+            ok: true,
+            usuario
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ok:false, errors:[{msg: error}]})
+    }
+}
+
 module.exports = {
     obtenerPerfil,
     obtenerMiPerfil,
     actualizarMiPerfil,
     actualizarMiPassword,
-    seguirUsuario
+    seguirUsuario,
+    updateImagen
 }

@@ -1,9 +1,10 @@
 const {Router} = require('express')
 const { param, body } = require('express-validator')
-const { obtenerPerfil, obtenerMiPerfil, actualizarMiPerfil, actualizarMiPassword, seguirUsuario } = require('../controllers/user.controller')
+const { obtenerPerfil, obtenerMiPerfil, actualizarMiPerfil, actualizarMiPassword, seguirUsuario, updateImagen } = require('../controllers/user.controller')
 const { existeUsuarioId } = require('../helpers/db-validation-helper')
 const { isPhoneNumber, isSecurePassword } = require('../helpers/validation-helper')
 const { checkErrors } = require('../middlewares/errors-validation')
+const { existFiles } = require('../middlewares/files-validation')
 const { JWT_validator } = require('../middlewares/JWT-validation')
 const router = Router()
 
@@ -56,6 +57,12 @@ router.put('/usuarios/update/password', [
     body('newpassword').custom(isSecurePassword),
     checkErrors
 ], actualizarMiPassword)
+
+router.put('/usuarios/update/imagen', [
+    existFiles,
+    JWT_validator,
+    checkErrors
+], updateImagen)
 
 router.put('/usuarios/seguir/:id', [
     JWT_validator,

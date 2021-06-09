@@ -1,6 +1,7 @@
 const express = require('express')
 const {dbConnection} = require('../database/config')
 const cors = require('cors');
+const fileUpload = require('express-fileupload')
 
 class Server{
 
@@ -21,6 +22,11 @@ class Server{
         this.app.use(express.urlencoded({extended: false}))
         this.app.use(express.json()) 
         this.app.use(cors())
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/',
+            createParentPath: true //Crea la carpeta si la ruta no existe
+        }));
     }
 
     activeRoutes(){
