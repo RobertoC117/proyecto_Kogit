@@ -58,10 +58,10 @@ const obtenerMiPerfil = async(req = request, res = response) => {
 const actualizarMiPerfil = async(req = request, res = response) =>{
     try {
         //const {nombre, telefono, twitter, website, ubicacion, company} = req.body
-        const {password, username, email, seguidores, seguidos, _id, ...resto} = req.body
+        const {estado, pregunta, respuesta, imgURL, password, username, email, seguidores, seguidos, _id, ...resto} = req.body
 
         const id = req.usuarioAutenticado._id
-    
+        
         const user_data = await Usuario.findByIdAndUpdate(id, resto, {new: true, projection:{estado:0, pregunta:0, role:0}})
     
         const data = {

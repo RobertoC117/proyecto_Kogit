@@ -43,10 +43,10 @@ router.get('/usuarios/miperfil', [
 router.put('/usuarios/update/miperfil', [
     JWT_validator,
     body('nombre','El nombre debe ser un string de 6 a 50 caracteres').if(body('nombre').exists()).isString().isLength({min: 6, max:50}),
-    body('twitter').if(body('twitter').exists()).isString().isLength({min:3, max:20}),
-    body('company','El nombre de la empresa debe ser un string de 6 a 30 caracteres').if(body('company').exists()).isString().isLength({min: 2, max:30}),
-    body('website','El nombre de su sitio debe ser un string de 6 a 50 caracteres').if(body('website').exists()).isString().isLength({min: 6, max:50}),
-    body('ubicacion','La ubicacion debe ser un string de 6 a 50 caracteres').if(body('ubicacion').exists()).isString().isLength({min: 6, max:50}),
+    body('twitter', "El twitter debe ser un string de 3 a 20 caracteres").replace([""], null).if(body('twitter').exists({checkFalsy: true})).isString().isLength({min:3, max:20}),
+    body('company','El nombre de la empresa debe ser un string de 6 a 30 caracteres').replace([""], null).if(body('company').exists({checkFalsy: true})).isString().isLength({min: 2, max:30}),
+    body('website','El nombre de su sitio debe ser un string de 6 a 50 caracteres').replace([""], null).if(body('website').exists({checkFalsy: true})).isString().isLength({min: 6, max:50}),
+    body('ubicacion','La ubicacion debe ser un string de 6 a 50 caracteres').replace([""], null).if(body('ubicacion').exists({checkFalsy: true})).isString().isLength({min: 6, max:50}),
     body('telefono').if(body('telefono').exists()).custom(isPhoneNumber),
     checkErrors
 ], actualizarMiPerfil)
