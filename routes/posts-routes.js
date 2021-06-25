@@ -1,6 +1,7 @@
 const {Router} = require('express')
 const { param, body } = require('express-validator')
 const { obtenerRepositorio, 
+        MainPosts,
         crearPost, 
         obtenerPost, 
         actualizarPost, 
@@ -11,6 +12,12 @@ const { existePostId } = require('../helpers/db-validation-helper')
 const { checkErrors } = require('../middlewares/errors-validation')
 const { JWT_validator } = require('../middlewares/JWT-validation')
 const router = Router()
+
+//Obtener los posts de las personas que sigues
+router.get('/posts/main', [
+    JWT_validator,
+    checkErrors
+], MainPosts)
 
 //Obtener los posts del usuario
 router.get('/posts/misposts', [
@@ -54,7 +61,7 @@ router.put('/posts/editar/:id', [
 //Comentar un post
 router.put('/posts/comentar/:id', [
     JWT_validator,
-    body("texo", "El contenido del comentario es requerido").exists({checkFalsy: true}),
+    body("texto", "El contenido del comentario es requerido").exists({checkFalsy: true}),
     checkErrors
 ], comentarPost)
 

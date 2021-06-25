@@ -1,4 +1,5 @@
 const { request, response } = require("express")
+const { infoBusquedas } = require("../helpers/others")
 const { Post } = require("../models")
 
 const obtenerRepositorio = async(req = request, res = response) =>{
@@ -13,7 +14,39 @@ const obtenerRepositorio = async(req = request, res = response) =>{
         console.log(error)
         res.status(400).json({ok:false, errors:[{msg: error}]})
     }
-} 
+}
+
+const MainPosts = async(req = request, res = response) => {
+    try {
+        const {seguidos, _id} = req.usuarioAutenticado
+        let info = infoBusquedas(req)
+
+        let respuesta = await Post.find({autor:{ $in: seguidos}, estado: true})
+                            .populate('autor', ['nombre','username','imgURL'])
+                            .skip(info.salto)
+                            .limit(info.limite)
+
+        let posts = [];
+
+        respuesta.forEach((item)=>{
+            posts.push({
+                ...item.toJSON(),
+                me_gusta: item.users_likes.includes(_id)
+            })
+        })
+
+        res.json({
+            ok:true,
+            previous: info.previous,
+            next: info.next,
+            posts
+        })
+
+    } catch (error) {
+        res.status(400).json({ok:false, errors:[{msg: error}]})
+        console.log(error)
+    }
+}
 
 const obtenerPost = async(req = request, res = response) => {
     try {
@@ -33,6 +66,7 @@ const obtenerPost = async(req = request, res = response) => {
         })
 
     } catch (error) {
+        res.status(400).json({ok:false, errors:[{msg: error}]})
         console.log(error)
     }
 }
@@ -140,8 +174,8 @@ const like = async(req = request, res = response) => {
             return res.json({
                 ok: true, 
                 post:{
-                    me_gusta: false,
-                    ...post.toJSON()
+                    ...post.toJSON(),
+                    me_gusta: false
                 }
             })
         }
@@ -155,18 +189,20 @@ const like = async(req = request, res = response) => {
         return res.json({
             ok: true, 
             post:{
-                me_gusta: true,
-                ...post.toJSON()
+                ...post.toJSON(),
+                me_gusta: true
             }
         })
 
     } catch (error) {
+        res.status(400).json({ok:false, errors:[{msg: error}]})
         console.log(error)
     }
 }
 
 module.exports = {
     obtenerRepositorio,
+    MainPosts,
     crearPost,
     obtenerPost,
     actualizarPost,

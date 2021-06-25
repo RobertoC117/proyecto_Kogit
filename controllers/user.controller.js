@@ -61,7 +61,7 @@ const actualizarMiPerfil = async(req = request, res = response) =>{
         const {estado, pregunta, respuesta, imgURL, password, username, email, seguidores, seguidos, _id, ...resto} = req.body
 
         const id = req.usuarioAutenticado._id
-        
+
         const user_data = await Usuario.findByIdAndUpdate(id, resto, {new: true, projection:{estado:0, pregunta:0, role:0}})
     
         const data = {
@@ -157,6 +157,7 @@ const seguirUsuario = async(req = request, res = response) =>{
 const updateImagen = async(req = request, res = response) => {
     try {
         const {tempFilePath, name} = req.files.archivo
+        console.log(req.files.archivo)
 
         const extensionesValidas = ['png','jpg','jpeg','gif']
 
