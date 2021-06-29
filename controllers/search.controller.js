@@ -3,10 +3,12 @@ const { infoBusquedas } = require("../helpers/others")
 const { Post } = require("../models")
 
 const buscar = (req = request, res = response) =>{
-    let {valor} = req.body
+    let {valor} = req.query
     let {termino} = req.params
     const {_id} = req.usuarioAutenticado
-    //console.log(req.hostname + req.baseUrl +req.path)
+
+    valor = valor.trim()
+   
     let metodos = {
         tags: buscarTags,
         lenguaje: buscarLenguaje
@@ -16,28 +18,19 @@ const buscar = (req = request, res = response) =>{
         return res.status(400).json({ok:false, errors:[{msg: 'Este termino de busqueda no existe, intente tags o lenguaje'}]})
     }
 
-    metodos[termino](valor, _id,  infoBusquedas(req), res)
+    metodos[termino](valor, _id,  infoBusquedas(req, {hasValor: true}), res)
 }
 
 const buscarTags = async(valor, idUser, info ,res = response) =>{
     try {
 
-        if(!Array.isArray(valor)){
-            return res.status(400).json({
-                ok: false,
-                errors:[
-                    {
-                        msg: 'El valor proporcionado debe ser un array' 
-                    }
-                ]
-            })
-        }
-
-        for (let i = 0; i < valor.length; i++) {
-            valor[i] = new RegExp(valor[i],'i')
+        let valores = valor.split(" ")
+        
+        for (let i = 0; i < valores.length; i++) {
+            valores[i] = new RegExp(valores[i],'i')
         }
         
-        const resultados = await Post.find({tags:{ $in: valor }, estado: true})
+        const resultados = await Post.find({tags:{ $in: valores }, estado: true})
                                 .populate('autor', ['nombre','username','imgURL'])
                                 .skip(info.salto)
                                 .limit(info.limite)
@@ -51,7 +44,7 @@ const buscarTags = async(valor, idUser, info ,res = response) =>{
             })
         })
 
-        const total = await Post.countDocuments({tags:{ $in: valor }, estado: true})
+        const total = await Post.countDocuments({tags:{ $in: valores }, estado: true})
 
         res.json({
             ok: true,

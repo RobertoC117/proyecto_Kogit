@@ -26,7 +26,10 @@ const MainPosts = async(req = request, res = response) => {
                             .skip(info.salto)
                             .limit(info.limite)
 
-        let posts = [];
+        const total = await Post.countDocuments({autor:{ $in: seguidos}, estado: true})
+
+        let posts = [];//Todo lo que se hace con esta variables es por que lo que devuelve mongoose es inmutable 
+                        //y no se puede añadir la propiedad me_gusta directamente
 
         respuesta.forEach((item)=>{
             posts.push({
@@ -37,6 +40,7 @@ const MainPosts = async(req = request, res = response) => {
 
         res.json({
             ok:true,
+            total,
             previous: info.previous,
             next: info.next,
             posts
