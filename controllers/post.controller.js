@@ -2,6 +2,16 @@ const { request, response } = require("express")
 const { infoBusquedas } = require("../helpers/others")
 const { Post } = require("../models")
 
+const getAllPosts = async(req = request, res = response) =>{
+    try {
+        const all = await Post.find(undefined, {comentarios:0, users_likes:0})
+        res.json(all)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ok:false, errors:[{msg: error}]})
+    }
+}
+
 const obtenerRepositorio = async(req = request, res = response) =>{
     try {
         const id = req.usuarioAutenticado._id
@@ -212,5 +222,6 @@ module.exports = {
     actualizarPost,
     eliminarPost,
     comentarPost,
-    like
+    like,
+    getAllPosts
 }

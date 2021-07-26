@@ -7,11 +7,14 @@ const { obtenerRepositorio,
         actualizarPost, 
         eliminarPost,
         comentarPost, 
-        like} = require('../controllers/post.controller')
+        like,
+        getAllPosts} = require('../controllers/post.controller')
 const { existePostId } = require('../helpers/db-validation-helper')
 const { checkErrors } = require('../middlewares/errors-validation')
 const { JWT_validator } = require('../middlewares/JWT-validation')
 const router = Router()
+
+router.get('/posts/all', getAllPosts)
 
 //Obtener los posts de las personas que sigues
 router.get('/posts/main', [
