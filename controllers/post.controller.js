@@ -151,6 +151,7 @@ const comentarPost = async(req = request, res = response) =>{
             texto
         }
         const post = await Post.findByIdAndUpdate(id, {$push:{comentarios:comentario}}, {new: true})
+                                .populate('autor',['nombre','username','imgURL'])
                                 .populate('comentarios.usuario',['nombre', 'username', 'imgURL'])
 
         let me_gusta = post.users_likes.includes(comentario.usuario)
