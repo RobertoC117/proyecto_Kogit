@@ -15,7 +15,7 @@ const getAllPosts = async(req = request, res = response) =>{
 const obtenerRepositorio = async(req = request, res = response) =>{
     try {
         const id = req.usuarioAutenticado._id
-        const posts = await Post.find({autor:id, estado:true},'titulo texto lenguaje fecha likes tags')
+        const posts = await Post.find({autor:id, estado:true},'titulo texto lenguaje fecha likes tags',{sort:{fecha:"desc"}})
         res.json({
             ok: true,
             posts,
@@ -31,7 +31,7 @@ const MainPosts = async(req = request, res = response) => {
         const {seguidos, _id} = req.usuarioAutenticado
         let info = infoBusquedas(req)
 
-        let respuesta = await Post.find({autor:{ $in: seguidos}, estado: true})
+        let respuesta = await Post.find({autor:{ $in: seguidos}, estado: true}, undefined, {sort:{fecha:"desc"}})
                             .populate('autor', ['nombre','username','imgURL'])
                             .skip(info.salto)
                             .limit(info.limite)

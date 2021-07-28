@@ -12,7 +12,7 @@ const obtenerPerfil = async(req = request, res = response) => {
     try {
     
         const user_data = await Usuario.findById(id,{estado:0, pregunta:0, role:0})
-        const user_posts = await Post.find({autor: id})
+        const user_posts = await Post.find({autor: id}, undefined, {sort:{fecha:"desc"}})
 
         const seguido = user_data.seguidores.includes(miID)
 
@@ -119,14 +119,14 @@ const seguirUsuario = async(req = request, res = response) =>{
         const {id} = req.params
         const miID = req.usuarioAutenticado._id
 
-        let perfil = await Usuario.findById(id)
-        const posts = await Post.find({autor: id})
+        let perfil = await Usuario.findById(id, {estado:0, pregunta:0, role:0})
+        const posts = await Post.find({autor: id}, undefined, {sort:{fecha:"desc"}})
         let seguido = perfil.seguidores.includes(miID)
 
         if(seguido){
-            perfil = await Usuario.findByIdAndUpdate(id,{ $pull:{ seguidores: miID } }, {new: true})
+            perfil = await Usuario.findByIdAndUpdate(id,{ $pull:{ seguidores: miID } }, {new: true, projection:{estado:0, pregunta:0, role:0}})
             await Usuario.findByIdAndUpdate(miID,{ $pull:{ seguidos: id } })
-            return res.json({
+            return res.json({ 
                 ok: true,
                 usuario: {
                     seguido: false,
