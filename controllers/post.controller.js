@@ -176,13 +176,11 @@ const like = async(req = request, res = response) => {
         const {_id} = req.usuarioAutenticado
         let post = await Post.findById(id_post)
 
-        console.log(_id)
-
         let me_gusta = post.users_likes.includes(_id)
         
         if(me_gusta)
         {
-            post = await Post.findByIdAndUpdate(id_post, {$pull:{users_likes:_id}}, {new: true})
+            post = await Post.findByIdAndUpdate(id_post, {$pull:{users_likes:_id}, $inc:{likes:-1}}, {new: true})
                             .populate('autor',['nombre','username','imgURL'])
                             .populate('comentarios.usuario',['nombre', 'username', 'imgURL'])
 
@@ -195,6 +193,7 @@ const like = async(req = request, res = response) => {
             })
         }
 
+        post.likes = post.likes + 1
         post.users_likes.push(_id)
         await post.save()
 
